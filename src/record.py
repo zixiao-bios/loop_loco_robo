@@ -9,24 +9,16 @@ from std_msgs.msg import String
 import sys
 from threading import Lock
 from take_pc_pose import TakePcPose
-
-
-service_lock = Lock()
-data_taker = None
+from pc_pose_dataset import PcPoseDataset
 
 
 def handle_set_reference_pc(req):
-    global reference_pc_duration, service_processing, service_lock
+    global reference_pc_duration, service_lock, dataset
     if service_lock.acquire(False):
-        # 在睡眠期间，topic callback 能否正常被调用？答：可以，service 处理函数不会阻塞 subscriber
         rospy.loginfo("taking reference pointscloud...")
         data = data_taker.get_pc_pose_with_block(reference_pc_duration)
+        dataset.save_reference(data["pc"], data["pose"], data["timestamp"])
         rospy.loginfo("finish")
-
-        # test
-        rospy.loginfo("data:")
-        for each in data:
-            rospy.loginfo(each)
 
         res = SetReferencePCResponse()
         res.state = 0
@@ -51,10 +43,13 @@ if __name__ == "__main__":
     process_pc_duration = rospy.get_param("~process_pc_duration")
     save_path = rospy.get_param("~save_path")
 
-    # add subscribers
     data_taker = TakePcPose(lidar_topic, lidar_type, map_frame)
+    dataset = PcPoseDataset(save_path)
+
+    # TODO: 检查数据集是否为空，以及相关逻辑
     
     # add service server
+    service_lock = Lock()
     rospy.Service("SetReferencePC", SetReferencePC, handle_set_reference_pc)
     rospy.loginfo('Service [SetReferencePC] is ready.')
 
