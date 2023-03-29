@@ -1,4 +1,3 @@
-sensor_msgs/PointCloud2 reference_pc
 ---
 int8 state
 string message

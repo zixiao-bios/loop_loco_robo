@@ -1,0 +1,10 @@
+<launch>
+    <node pkg="loop_loco_robo" type="record.py" name="loop_loco_record" output="screen" >
+        <param name="map_frame" value="map" />
+        <param name="lidar_topic" value="livox_data" />
+        <param name="lidar_type" value="-1" />
+        <param name="reference_pc_duration" value="5" />
+        <param name="process_pc_duration" value="1" />
+        <param name="save_path" value="/home/zixiao/loop_loco_robo_ws/src/loop_loco_robo/data/01/" />
+    </node>
+</launch>
