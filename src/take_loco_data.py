@@ -6,8 +6,9 @@ from std_msgs.msg import String
 from sensor_msgs.msg import PointCloud2
 import copy
 import sys
+from loco_data import LocoData
 
-class TakePcPose:
+class TakeLocoData:
     def __init__(self, lidar_topic, lidar_type, map_frame):
         self._lidar_topic = lidar_topic
         self._lidar_type = lidar_type
@@ -50,8 +51,11 @@ class TakePcPose:
             self._lidar_buffer_lock.release()
             rospy.sleep(duration)
             self._lidar_buffer_lock.acquire(True)
-            res = copy.deepcopy(self._lidar_data_list)
+
+            # TODO：将多帧点云、pose、timestamp合并，并转为通用格式
+            lidar_data = copy.deepcopy(self._lidar_data_list)
+
             self._lock.release()
-            return res
+            return ["pc", "pose", "timestamp"]
         else:
             return []
