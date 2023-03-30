@@ -84,3 +84,6 @@ class LocoData:
         trans[:3, 3] = map(float, txt[1:4])
 
         return cls(pc, trans, timestamp, distance)
+
+    def __str__(self):
+        return "{} {}".format(self.to_tum_str(), str(self._distance))
