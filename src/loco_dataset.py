@@ -1,43 +1,59 @@
 #!/usr/bin/env python
 # encoding: utf-8
 from pathlib import Path
-import open3d
 from loco_data import LocoData
 
 
-class PcPoseDataset:
-    def __init__(self, save_path):
-        pass
+class LocoDataSet:
+    def __init__(self, dataset_path):
+        self._path = Path(dataset_path)
+        if not self._path.is_dir():
+            self._path.mkdir()
+        self._refer_file_name = "reference"
+        self._has_refer = False
+        self._measure_file_name = []
+
+        name_set = set()
+        for path in self._path.iterdir():
+            if path.stem == self._refer_file_name:
+                self._has_refer = True
+            else:
+                name_set.add(path.stem)
+        self._measure_file_name = name_set
+        self._measure_file_name = sorted(self._measure_file_name)
 
     def save_reference(self, loco_data):
-        """Asynchronous save reference data to file.
+        """Save reference data to file.
 
         The file name is fixed, if the file already exists, it will be overwritten.
         """
-        # TODO：这里异步保存，不要阻塞，下同
-        pass
+        loco_data.save_to_file(self._path, self._refer_file_name)
+        self._has_refer = True
 
     def save_measure(self, loco_data):
-        """Asynchronous save measure data to file.
+        """Save measure data to file.
 
         The file name is auto computed, so it always write to the new file.
         """
-        pass
-
-    def clear(self):
-        pass
+        if len(self._measure_file_name) > 0:
+            name = int(self._measure_file_name[-1]) + 1
+        else:
+            name = 0
+        name = str(name).zfill(4)
+        loco_data.save_to_file(self._path, name)
+        self._measure_file_name.append(name)
 
     def is_empty(self):
-        pass
+        return not self.has_reference() and self.get_measure_num() == 0
 
-    def have_reference(self):
-        pass
+    def has_reference(self):
+        return self._has_refer
 
     def get_reference(self):
-        pass
+        return LocoData.from_file(self._path, self._refer_file_name)
 
     def get_measure_num(self):
-        pass
+        return len(self._measure_file_name)
 
     def get_measure(self, idx):
-        pass
+        return LocoData.from_file(self._path, self._measure_file_name[idx])
