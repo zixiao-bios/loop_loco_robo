@@ -1,0 +1,26 @@
+<launch>
+<!--    电梯-->
+   <arg name="bag_file" default="/home/zixiao/bags/yuhesen_loc_2023-04-06-15-40-40/yuhesen_loc_2023-04-06-15-40-40.bag" />
+   <arg name="start_sec" default="158" />
+   <arg name="end_time" default="1680767147" />
+
+<!--    原地旋转-->
+<!--    <arg name="bag_file" default="/home/zixiao/bags/yuhesen_loc_2023-04-06-15-48-25/yuhesen_loc_2023-04-06-15-48-25.bag" />-->
+<!--    <arg name="start_sec" default="45" />-->
+<!--    <arg name="end_time" default="1680767458" />-->
+
+<!--    直线极速-->
+    <!-- <arg name="bag_file" default="/home/zixiao/bags/yuhesen_loc_2023-04-06-15-48-25/yuhesen_loc_2023-04-06-15-48-25.bag" />
+    <arg name="start_sec" default="190" />
+    <arg name="end_time" default="1680767525" /> -->
+
+    <param name="/use_sim_time" value="true" />
+    <param name="/start_sec" type="double" value="$(arg start_sec)" />
+    <param name="/end_time" type="double" value="$(arg end_time)" />
+
+    <node pkg="rosbag" type="play" name="rosbag_play" args="-s $(arg start_sec) -r 3 --topics /tf --clock $(arg bag_file)" />
+    <node pkg="loop_loco_robo" type="tf_analyst.py" name="tf_analyst" output="screen" >
+        <param name="target_frame" value="map" />
+        <param name="source_frame" value="body" />
+    </node>
+</launch>
