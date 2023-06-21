@@ -11,7 +11,7 @@ from std_msgs.msg import String
 import sys
 from threading import Lock
 from take_loco_data import TakeLocoData
-from loco_dataset import PcPoseDataset
+from loco_dataset import LocoDataSet
 
 
 def handle_set_reference_pc(req):
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     save_path = rospy.get_param("~save_path")
 
     data_taker = TakeLocoData(lidar_topic, lidar_type, map_frame)
-    dataset = PcPoseDataset(save_path)
+    dataset = LocoDataSet(save_path)
 
     # TODO: 检查数据集是否为空，以及相关逻辑
 
